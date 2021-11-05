@@ -39,7 +39,6 @@ module.exports = {
 
     if (holdings) {
       let existingQuantity = holdings.quantity;
-      let existingPrice = holdings.avgPrice;
 
       if (options.quantity <= existingQuantity) {
         if (options.quantity === existingQuantity) {
@@ -51,16 +50,10 @@ module.exports = {
           return holding;
         }
 
-        let totalExistingPrice = existingPrice * existingQuantity;
-        let totalNewPrice = options.price * options.quantity;
-
-        let avgPrice = (totalExistingPrice - totalNewPrice) / (existingQuantity - options.quantity);
-
         let holding = await Holding.updateOne({
           portfolioId: options.portfolioId,
           stockId:options.stockId
         }).set({
-          avgPrice,
           quantity: existingQuantity - options.quantity
         }).fetch();
 

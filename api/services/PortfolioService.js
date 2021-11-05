@@ -25,5 +25,22 @@ module.exports = {
     }
 
     return updatedPortfolio;
+  },
+
+  getCurrentPortfolioValue: async (portfolioId) => {
+    let holdings = await Holding.find({portfolioId: portfolioId});
+    let stockDetails = await Stock.find({id: _.map(holdings, 'stockId')});
+    let stocks = _.reduce(stockDetails, (res, item) => {
+      _.assign(res, {[item.id]: item});
+      return res;
+    }, {});
+    let total = 0;
+
+    _.forEach(holdings, (holding) => {
+      console.log(holding);
+      total += holding.quantity * _.get(stocks, [holding.stockId, 'price']);
+    });
+
+    return total;
   }
 };

@@ -5,7 +5,7 @@ module.exports ={
       autoIncrement: true,
       unique: true
     },
-    curretValue: {
+    currentValue: {
       type: 'number',
       defaultsTo: 0
     },
