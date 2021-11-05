@@ -6,15 +6,15 @@ module.exports = {
 
     return res.id;
   },
-  addMoney: async (options, moneyToBeAdded) => {
-    let res = await Wallet.find({id: options.walletId});
 
-    let updatedWallet = await Wallet.updateOne({id: options.walletId}).set({money: res.money+moneyToBeAdded});
+  addMoney: async (options, moneyToBeAdded) => {
+    let res = await Wallet.findOne({id: options.walletId});
+    let updatedWallet = await Wallet.updateOne({id: options.walletId}).set({money: res.money + moneyToBeAdded}).fetch();
 
     return updatedWallet;
   },
-  removeMoney: async (options, moneyToBeRemoved) => {
 
+  removeMoney: async (options, moneyToBeRemoved) => {
     let res = await Wallet.findOne({id: options.walletId});
 
     if (res.money >= moneyToBeRemoved) {

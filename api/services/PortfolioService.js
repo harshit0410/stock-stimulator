@@ -17,7 +17,7 @@ module.exports = {
 
         break;
       }
-      case 'subtract': {
+      case 'remove': {
         updatedPortfolio = await Portfolio.updateOne({id: options.portfolioId}).set({investedValue: res.investedValue - amount});
 
         break;

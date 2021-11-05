@@ -22,7 +22,7 @@ module.exports = {
   findOne: async (req, res) => {
     var options = req.allParams();
 
-    var resData = await User.findOne({id: options.id});
+    var resData = await UserService.getUser(options.id);
 
     res.send(resData);
   },

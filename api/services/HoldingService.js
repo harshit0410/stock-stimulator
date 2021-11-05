@@ -17,7 +17,7 @@ module.exports = {
         stockId:options.stockId
       }).set({
         avgPrice,
-        quantity: options.quantity + existingQuantity
+        quantity: existingQuantity + options.quantity
       });
 
       return holding;
@@ -33,7 +33,44 @@ module.exports = {
       return holding;
     }
   },
-  removeStock: async () => {
 
-  } 
+  removeStock: async (options) => {
+    let holdings = await Holding.findOne({portfolioId: options.portfolioId, stockId:options.stockId});
+
+    if (holdings) {
+      let existingQuantity = holdings.quantity;
+      let existingPrice = holdings.avgPrice;
+
+      if (options.quantity <= existingQuantity) {
+        if (options.quantity === existingQuantity) {
+          let holding = await Holding.destroyOne({
+            portfolioId: options.portfolioId,
+            stockId:options.stockId
+          }).fetch();
+
+          return holding;
+        }
+
+        let totalExistingPrice = existingPrice * existingQuantity;
+        let totalNewPrice = options.price * options.quantity;
+
+        let avgPrice = (totalExistingPrice - totalNewPrice) / (existingQuantity - options.quantity);
+
+        let holding = await Holding.updateOne({
+          portfolioId: options.portfolioId,
+          stockId:options.stockId
+        }).set({
+          avgPrice,
+          quantity: existingQuantity - options.quantity
+        }).fetch();
+
+        return holding;
+      }
+
+      return Promise.reject(new Error('Sold quantity is greater than holding quantity.'));
+    }
+    else {
+      return Promise.reject(new Error('Not such stock exist in your holding.'));
+    }
+  }
 };
