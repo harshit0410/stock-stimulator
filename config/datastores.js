@@ -40,6 +40,4 @@ module.exports.datastores = {
     password: 'password',
     database: 'stock_stimulator'
   }
-
-
 };

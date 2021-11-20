@@ -18,7 +18,9 @@ module.exports.policies = {
   ***************************************************************************/
 
   'Authentication/isAuthenticated': true,
-  'Authentication/login': true,
-  '*': 'isAuthenticated',
-
+  'Authentication/login': 'validateLoginData',
+  'User/create': 'validateUserData',
+  'User/update': ['isAuthenticated', 'isValidUserId', 'validateUserData'],
+  'User/findOne': ['isAuthenticated', 'isValidUserId'],
+  '*': 'isAuthenticated'
 };

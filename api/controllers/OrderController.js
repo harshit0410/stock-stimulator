@@ -9,24 +9,42 @@ module.exports = {
     let totalPrice = options.data.quantity * stockPrice;
 
     if ( options.data.type === 'buy') {
-      await WalletService.removeMoney(options.data, totalPrice);
+      try {
+        await sails.getDatastore('mySQL').transaction(
+          async (db) => {
+            await WalletService.removeMoney(options.data, totalPrice, db);
 
-      let resData = await OrderService.createOrder(options.data);
+            let resData = await OrderService.createOrder(options.data, db);
 
-      await HoldingService.addStock(options.data);
-      await PortfolioService.updatePortfolio(options.data, totalPrice, 'add');
+            await HoldingService.addStock(options.data, db);
+            await PortfolioService.updatePortfolio(options.data, totalPrice, 'add', db);
 
-      return res.send(resData);
+            return res.send(resData);
+          }
+        );
+      }
+      catch (err) {
+        return Promise.reject(err);
+      }
     }
 
     else if (options.data.type === 'sell') {
-      let holdings = await HoldingService.removeStock(options.data);
-      await PortfolioService.updatePortfolio(options.data, holdings.avgPrice * options.data.quantity, 'remove');
+      try {
+        await sails.getDatastore('mySQL').transaction(
+          async (db) => {
+            let holdings = await HoldingService.removeStock(options.data, db);
+            await PortfolioService.updatePortfolio(options.data, holdings.avgPrice * options.data.quantity, 'remove', db);
 
-      let resData = await OrderService.createOrder(options.data);
-      console.log(options.data);
-      await WalletService.addMoney(options.data, totalPrice);
-      return res.send(resData);
+            let resData = await OrderService.createOrder(options.data, db);
+
+            await WalletService.addMoney(options.data, totalPrice, db);
+            return res.send(resData);
+          }
+        );
+      }
+      catch (err) {
+        return Promise.reject(err);
+      }
     }
 
     else {

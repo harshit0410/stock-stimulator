@@ -1,24 +1,24 @@
 
 module.exports = {
 
-  createPortfolio: async () => {
-    let res = await Portfolio.create().fetch();
+  createPortfolio: async (db) => {
+    let res = await Portfolio.create().usingConnection(db).fetch();
 
     return res.id;
   },
 
-  updatePortfolio: async (options, amount, type) => {
+  updatePortfolio: async (options, amount, type, db) => {
     let res = await Portfolio.findOne({id: options.portfolioId});
     let updatedPortfolio;
 
     switch (type) {
       case 'add':{
-        updatedPortfolio = await Portfolio.updateOne({id: options.portfolioId}).set({investedValue: res.investedValue + amount});
+        updatedPortfolio = await Portfolio.updateOne({id: options.portfolioId}).set({investedValue: res.investedValue + amount}).usingConnection(db);
 
         break;
       }
       case 'remove': {
-        updatedPortfolio = await Portfolio.updateOne({id: options.portfolioId}).set({investedValue: res.investedValue - amount});
+        updatedPortfolio = await Portfolio.updateOne({id: options.portfolioId}).set({investedValue: res.investedValue - amount}).usingConnection(db);
 
         break;
       }

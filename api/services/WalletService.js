@@ -1,24 +1,24 @@
 
 module.exports = {
 
-  createWallet: async () => {
-    let res = await Wallet.create({money: 10000}).fetch();
+  createWallet: async (db) => {
+    let res = await Wallet.create({money: 10000}).usingConnection(db).fetch();
 
     return res.id;
   },
 
-  addMoney: async (options, moneyToBeAdded) => {
+  addMoney: async (options, moneyToBeAdded, db) => {
     let res = await Wallet.findOne({id: options.walletId});
-    let updatedWallet = await Wallet.updateOne({id: options.walletId}).set({money: res.money + moneyToBeAdded}).fetch();
+    let updatedWallet = await Wallet.updateOne({id: options.walletId}).set({money: res.money + moneyToBeAdded}).usingConnection(db);
 
     return updatedWallet;
   },
 
-  removeMoney: async (options, moneyToBeRemoved) => {
+  removeMoney: async (options, moneyToBeRemoved, db) => {
     let res = await Wallet.findOne({id: options.walletId});
 
     if (res.money >= moneyToBeRemoved) {
-      let updatedWallet = await Wallet.updateOne({id: options.walletId}).set({money: res.money - moneyToBeRemoved}).fetch();
+      let updatedWallet = await Wallet.updateOne({id: options.walletId}).set({money: res.money - moneyToBeRemoved}).usingConnection(db);
 
       return Promise.resolve(updatedWallet);
     }

@@ -1,6 +1,6 @@
 
 module.exports = {
-  addStock: async (options) => {
+  addStock: async (options, db) => {
     let res = await Holding.findOne({portfolioId: options.portfolioId, stockId:options.stockId});
 
     if (res) {
@@ -18,7 +18,7 @@ module.exports = {
       }).set({
         avgPrice,
         quantity: existingQuantity + options.quantity
-      });
+      }).usingConnetion(db);
 
       return holding;
     }
@@ -28,13 +28,13 @@ module.exports = {
         stockId: options.stockId,
         quantity: options.quantity,
         avgPrice: options.price
-      });
+      }).usingConnetion(db).fetch();
 
       return holding;
     }
   },
 
-  removeStock: async (options) => {
+  removeStock: async (options, db) => {
     let holdings = await Holding.findOne({portfolioId: options.portfolioId, stockId:options.stockId});
 
     if (holdings) {
@@ -45,7 +45,7 @@ module.exports = {
           let holding = await Holding.destroyOne({
             portfolioId: options.portfolioId,
             stockId:options.stockId
-          }).fetch();
+          }).usingConnetion(db);
 
           return holding;
         }
@@ -55,7 +55,7 @@ module.exports = {
           stockId:options.stockId
         }).set({
           quantity: existingQuantity - options.quantity
-        }).fetch();
+        }).usingConnetion(db);
 
         return holding;
       }
